@@ -1,0 +1,298 @@
+select
+    * _pg_foreign_table_columns;
+create schema sqlb1;
+create schema db2;
+create schema db3;
+    
+   create table db2.table_students(id serial, name VARCHAR);
+  alter schema sqlb1 rename to rename_schema;
+  
+  create user testuser ;
+alter schema db2 owner to testuser;
+
+alter schema db2 rename to db7;
+create table db7.table_students2(id serial, name VARCHAR);
+
+create user testuser2 with password '1234';
+
+alter schema db7 owner to testuser;
+
+create user testuser3 with password '123';
+
+alter table db7.table_students2 owner to testuser3;
+
+
+drop schema db3;
+
+create table db4.versity_student(
+id serial,
+name VARCHAR,
+father VARCHAR);
+
+---sequences---
+select nextval('db4.versity_student_id_seq':: regclass);
+
+
+alter sequence db4.versity_student_id_seq RESTART with 1070;
+
+drop table db4.student;
+alter table db4.versity_student rename to versity_students;
+
+alter table db4.versity_students
+add column secsion SMALLINT,
+add column phone VARCHAR;
+
+DELETE from db4.versity_students WHERE id = 1070;
+---delete remove a/many specific row/rows----
+---DDL,DML,DQL,DCL are the four types of sql query--
+
+TRUNCATE table db4.versity_students;
+---trancate is a DDL comand--
+DELETE from db4.versity_students; --DML--
+
+---DATA MANIPULATION LANGUAGE---
+--1. INSERT--
+--2. UPDATE--
+--3. DELETE--
+
+create schema class5;
+
+create table class5.consumer_sales(
+id serial8,
+sales_date_time TIMESTAMP,
+product VARCHAR,
+price FLOAT4,
+payment_type VARCHAR,
+consumer VARCHAR,
+consumer_city VARCHAR,
+consumer_state VARCHAR,
+consumer_country VARCHAR,
+post_code INTEGER,
+account_creation_time TIMESTAMP,
+consumer_latitute float8,
+consumer_longitude float8
+);
+
+insert into class5.consumer_sales
+values (
+ 1, --id serial8, 
+'2022-09-09:06:36:01.00',  --'YYYY-MM-DD:HH:MM:SS' --sales_date_time TIMESTAMP,---
+'Mobile Phone',--product VARCHAR,
+45000.50,--price FLOAT4,
+'Bkash',--payment_type VARCHAR,
+'Syed Rahman',--consumer VARCHAR,
+'Dhanmondi',--consumer_city VARCHAR,
+'Dhaka',--consumer_state VARCHAR,
+'BD',--consumer_country VARCHAR,
+1201,--post_code INTEGER,
+'2022-09-09:06:36:01.00', --account_creation_time TIMESTAMP,
+54.43567535,--consumer_latitute float8,
+34.43567535--consumer_longitude float8
+);
+
+----------- ANOTHER WAY----
+
+insert into class5.consumer_sales
+values (
+
+ --1 --id serial8, 
+now(),  --'YYYY-MM-DD:HH:MM:SS' --sales_date_time TIMESTAMP,---
+'Mobile Phone',--product VARCHAR,
+45000.50,--price FLOAT4,
+'Bkash',--payment_type VARCHAR,
+'Syed Rahman',--consumer VARCHAR,
+'Dhanmondi',--consumer_city VARCHAR,
+'Dhaka',--consumer_state VARCHAR,
+'BD',--consumer_country VARCHAR,
+1201,--post_code INTEGER,
+now(), --account_creation_time TIMESTAMP,
+54.43567535,--consumer_latitute float8,
+34.43567535--consumer_longitude float8
+);
+
+-----------ANOTHER WAY----BEST WAY ACCORDING TO BHAIA----
+
+insert into class5.consumer_sales
+(
+consumer_latitute ,
+consumer_longitude,
+sales_date_time,
+price ,
+payment_type,
+consumer ,
+consumer_state ,
+consumer_country ,
+post_code ,
+account_creation_time
+)
+VALUES
+(
+54.43567535,--consumer_latitute float8,
+34.43567535,--consumer_longitude float8 
+'2022-09-09 06:36:01.00',  --'YYYY-MM-DD:HH:MM:SS' --sales_date_time TIMESTAMP,---
+45000.50,--price FLOAT4,
+'Bkash',--payment_type VARCHAR,
+'Syed Rahman',--consumer VARCHAR,
+'Dhaka',--consumer_state VARCHAR,
+'BD',--consumer_country VARCHAR,
+1201,--post_code INTEGER,
+'2022-09-09:06:36:01.00' --account_creation_time TIMESTAMP,
+);
+
+ --- WE CAN SUFFLE THE COLUMN AND NEED TO MAINTAIN THE NEW SEQENCE---
+
+
+update 
+class5.consumer_sales as csl  
+set price = csl.price+ 10000
+where csl.id = 4;
+
+-------------------------------
+
+create table class5.products(
+id serial,
+product_name VARCHAR,
+price FLOAT,
+quantity_sold INTEGER
+);
+
+insert into class5.products 
+(
+product_name ,
+price ,
+quantity_sold
+)
+VALUES
+(
+ipad,
+4566.53,
+2
+);
+
+-----DELETE-----------
+delete from class5.consumer_sales as sales   ---- IF WE USE MULTIPLE TABLE ALIAS IS MENDATORY 
+where sales.id = 2;
+
+
+select * from class5.consumer_sales as sales 
+where sales.id = 3;                            ------ ****BEFORE DELETE SELECT QUERY CHALIA DEKHA NIBO***
+
+create schema archive;
+
+delete from class5.consumer_sales as sales 
+where sales.id = 3;
+
+create table archive.consumer_sales_20220910_03_08pm
+as 
+select * from class5.consumer_sales as sales 
+where sales.id = 3;
+
+--'after creating the table inside the schema now we can delet'--
+
+insert into class5.consumer_sales
+select * from archive.consumer_sales_20220910_03_08pm;
+
+INSERT INTO class5.consumer_sales
+       (id,sales_date_time, product, price, payment_type, consumer, consumer_city, consumer_state, consumer_country, post_code, account_creation_time, consumer_latitute, consumer_longitude)
+SELECT id, sales_date_time, product, price,  payment_type, consumer, consumer_city, consumer_state, consumer_country, post_code, account_creation_time, consumer_latitute, consumer_longitude
+FROM archive.consumer_sales_20220910_03_08pm;
+
+
+--DELETE COLUMN--FORMULA
+--alter table class5.consumer_sales
+--drop column adress;--
+--**ALTERING SOMETING IS NOT GOOD***
+
+--DQL--
+
+SELECT * from class5.consumer_sales
+order by price DESC
+LIMIT 1;
+--SEQUENCE OF DQL--
+-----------------------
+#-- Row-Col Conversion
+#--subquery
+1. SELECT
+2.COLUMN NAME / operations
+#--subquery
+3.TABLE NAME 
+4. JOIN 
+#--subquery
+5.CONDITION( where )
+#--subquery
+#-- Custom input
+6.AGGREGATION Syntax 
+7. having
+8.Order 
+#--subquery
+9. limit
+----------------------
+
+select 2 + 2; 
+
+select 2*9;
+
+--- single line comment
+
+/** 
+Multiline comments 
+**/
+
+--"ctl+shift+/" = multiline command
+
+/**zoom out ctrl + -
+bezoom in ctrl + +
+autify: ctrl + i
+uglify: ctrl + shift_i**/
+
+/**select id, sales_date_time, product, price, payment_type, consumer, consumer_city, consumer_state, consumer_country, post_code, account_creation_time, consumer_latitute, consumer_longitude;**/
+
+select product, price, payment_type, consumer, consumer_city, consumer_state, consumer_country, post_code 
+from class5.consumer_sales as sales 
+where 
+sales.consumer_city = 'Dhaka'
+or sales.consumer_country = 'BD'
+;
+
+-----practice for GOOGLE DATA CLEANING-----
+
+create SCHEMA google4;
+drop table google4.furniture_store_transaction_table;
+
+/**DDL 
+Table types 
+1. Standard 
+2. Temporary **/
+
+--	temporary table--
+create schema class6;
+
+create TEMPORARY TABLE consumer_sales_temp
+as select * from class5.consumer_sales limit 0;
+
+select * from consumer_sales_temp;
+
+select * from information_schema."tables" where TABLE NAME = consumer_sales_temp;
+
+--DML--
+
+select * from class5.consumer_sales
+where consumer_city in('kolkata' ,'Saver');
+select
+    *
+from
+    class5.consumer_sales
+where
+    product like 'M%';
+    
+    alter table class6.as1_locations
+  drop column lat;
+  alter table class6.as1_locations
+  drop column long;
+  
+  CREATE SCHEMA class5;
+  create SCHEMA class6 ;
+
+
+
+
